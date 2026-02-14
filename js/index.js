@@ -16,7 +16,7 @@ for (let i = 0; i < images.length; i++) {
     let newEle = document.createElement("li");
     newEle.textContent = i + 1;
     if (i != images.length - 1) {
-        newEle.classList.add("me-2");
+        newEle.classList.add("me-lg-2","me-1");
     }
     indicators.append(newEle);
 }
