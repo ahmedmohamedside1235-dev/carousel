@@ -11,85 +11,107 @@ let popkeys = document.querySelectorAll(".item i"),
     nextImg = images[currentIndexImg],
     nextSrc = nextImg?.getAttribute("src");
 
-//* create indicators
+
 for (let i = 0; i < images.length; i++) {
-    let newEle = document.createElement("li");
-    newEle.textContent = i + 1;
+    let indicator = document.createElement("li");
+    indicator.textContent = i + 1;
     if (i != images.length - 1) {
-        newEle.classList.add("me-lg-2","me-1");
+        indicator.classList.add("me-lg-2", "me-1");
     }
-    indicators.append(newEle);
+    indicators.append(indicator);
 }
 
-//* select li after decleration
-let indicatLi = popup.querySelectorAll("ul li");
+popIndicator = Array.from(popup.querySelectorAll("ul li"));
+
 
 popkeys.forEach(function (popkey) {
     popkey.addEventListener("click", function () {
 
         let currentImg = popkey.parentElement.previousElementSibling,
-            currrentSrc = currentImg.getAttribute("src");
-        popupImg.setAttribute("src", currrentSrc);
+            currentSrc = currentImg.getAttribute("src");
+        popupImg.setAttribute("src", currentSrc);
 
-        // *update current index for image
         currentIndexImg = currentImg.dataset.index;
         updateActive();
         togglePopUp();
-    });
-})
-
-// * for next popup
-nextpop.addEventListener("click", nextImage);
-
-// * for previous popup
-prepop.addEventListener("click", preImg);
+    })
+});
 
 //* close popup
 popup.addEventListener("click", togglePopUp);
 closepop.addEventListener("click", togglePopUp);
-box.addEventListener("click", function (e) { e.stopPropagation() });
+box.addEventListener("click", function (e) {
+    e.stopPropagation();
+});
 
-//* change popup from indicators
-indicatLi.forEach(function (li) {
-    li.addEventListener("click", () => {
+//* next image
+nextpop.addEventListener("click", nextImage);
 
-        if ((li.textContent - 1) == currentIndexImg)
+//* previous image
+prepop.addEventListener("click", previousImage);
+
+popIndicator.forEach(function (li) {
+    li.addEventListener("click", function (e) {
+        if (popIndicator.indexOf(li) == currentIndexImg) {
             box.classList.add("current_Key");
-
-        currentIndexImg = li.textContent - 1;
+        }
+        currentIndexImg = popIndicator.indexOf(li);
         updateImg();
         updateActive();
-
     })
 })
 
-//* event on keyboard
+
+
+let timeOut,
+    keys = "";
+
 document.addEventListener("keydown", function (event) {
-    if (event.key == "ArrowLeft")
-        preImg();
 
-    else if (event.key == "ArrowRight")
+    const key = event.key;
+
+    if (key === "ArrowLeft") {
+        previousImage();
+        return;
+    }else if (key === "ArrowRight") {
         nextImage();
-
-    else if (event.key == "Escape")
+        return;
+    }else if (key === "Escape") {
         popup.classList.remove("active");
-
-    else if ((+(event.key) - 1) == currentIndexImg)
-        box.classList.add("current_Key");
-
-    else if (Number.isInteger(+(event.key)) && +(event.key) > 0 && +(event.key) <= indicatLi.length) {
-        currentIndexImg = event.key - 1;
-        updateImg();
-        updateActive();
+        return;
     }
-    else
-        box.classList.add("invalid_Key");
-})
 
-//* after end animation
+    if (!Number.isInteger(+key)) return;
+
+    keys += key;
+
+    clearTimeout(timeOut);
+
+    timeOut = setTimeout(() => {
+
+        const number = +keys;
+
+        if (number - 1 === currentIndexImg) {
+            box.classList.add("current_Key");
+
+        } else if (number > 0 && number <= popIndicator.length) {
+            currentIndexImg = number - 1;
+            updateImg();
+            updateActive();
+
+        } else {
+            box.classList.add("invalid_Key");
+        }
+
+        keys = "";
+
+    }, 500);
+});
+
 box.addEventListener("animationend", function () {
     box.classList.remove("invalid_Key");
     box.classList.remove("current_Key");
 })
+
 
 
